@@ -2,6 +2,7 @@ package com.dongyu.superaiiagent.app;
 
 import com.dongyu.superaiiagent.advisor.MyLoggerAdvisor;
 import com.dongyu.superaiiagent.advisor.ReReadingAdvisor;
+import com.dongyu.superaiiagent.chatmemory.FileBasedChatMemory;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
@@ -31,15 +32,27 @@ public class LoveApp {
     //初始化chatClient对象,指定系统提示词以及记忆advisor。通过构造器注入的方式注入dashscopeChatModel.
     private LoveApp(ChatModel dashscopeChatModel) {
 
+        //初始化基于文件的对话记忆
+        //定义文件的存放目录
+        String fileDir=System.getProperty("user.dir")+"/chat-memory";
+
+        FileBasedChatMemory chatMemory = new FileBasedChatMemory(fileDir);
+        chatClient=ChatClient.builder(dashscopeChatModel)
+                .defaultSystem(SYSTEM_PROMPT)
+                .defaultAdvisors(
+                        new MessageChatMemoryAdvisor(chatMemory)
+                )
+                .build();
+
         //初始化基于内存的对话记忆
-        InMemoryChatMemory chatMemory = new InMemoryChatMemory();
+        /*InMemoryChatMemory chatMemory = new InMemoryChatMemory();
         chatClient=ChatClient.builder(dashscopeChatModel)
                 .defaultSystem(SYSTEM_PROMPT)
                 .defaultAdvisors(
                         new MessageChatMemoryAdvisor(chatMemory),
                         new MyLoggerAdvisor()
                 )
-                .build();
+                .build();*/
 
     }
 
