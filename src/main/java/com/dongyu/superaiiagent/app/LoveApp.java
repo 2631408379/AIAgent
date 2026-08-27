@@ -34,7 +34,7 @@ public class LoveApp {
 
         //初始化基于文件的对话记忆
         //定义文件的存放目录
-        String fileDir=System.getProperty("user.dir")+"/chat-memory";
+        /*String fileDir=System.getProperty("user.dir")+"/chat-memory";
 
         FileBasedChatMemory chatMemory = new FileBasedChatMemory(fileDir);
         chatClient=ChatClient.builder(dashscopeChatModel)
@@ -42,17 +42,18 @@ public class LoveApp {
                 .defaultAdvisors(
                         new MessageChatMemoryAdvisor(chatMemory)
                 )
-                .build();
+                .build();*/
 
         //初始化基于内存的对话记忆
-        /*InMemoryChatMemory chatMemory = new InMemoryChatMemory();
+        InMemoryChatMemory chatMemory = new InMemoryChatMemory();
         chatClient=ChatClient.builder(dashscopeChatModel)
                 .defaultSystem(SYSTEM_PROMPT)
                 .defaultAdvisors(
                         new MessageChatMemoryAdvisor(chatMemory),
-                        new MyLoggerAdvisor()
+                        new MyLoggerAdvisor(),
+                        new ReReadingAdvisor()
                 )
-                .build();*/
+                .build();
 
     }
 
@@ -64,7 +65,6 @@ public class LoveApp {
                 .call()
                 .chatResponse();
         String result = response.getResult().getOutput().getText();
-        log.info("AI的回答是：{}",result);
         return result;
     }
 
