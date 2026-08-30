@@ -22,9 +22,13 @@ public class MyLoggerAdvisor implements CallAroundAdvisor, StreamAroundAdvisor {
 
 
     @Override
+    //第一个参数是AI请求的包装对象,包含一次AI调用的所有信息；第二个参数是责任链对象,用于调用下一个advisor
     public AdvisedResponse aroundCall(AdvisedRequest advisedRequest, CallAroundAdvisorChain chain) {
+        //处理请求(前置处理)
         advisedRequest = this.before(advisedRequest);
+        //调用链的下一个Advisor
         AdvisedResponse advisedResponse = chain.nextAroundCall(advisedRequest);
+        //处理响应(后置处理)
         this.observeAfter(advisedResponse);
         return advisedResponse;
     }

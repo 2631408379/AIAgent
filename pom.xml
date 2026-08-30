@@ -20,6 +20,20 @@
 
     <dependencies>
 
+        <!--查询增强依赖-->
+        <!--<dependency>
+            <groupId>org.springframework.ai</groupId>
+            <artifactId>spring-ai-advisors-vector-store</artifactId>
+        </dependency>-->
+
+
+        <!--读取markdown文档依赖-->
+        <dependency>
+            <groupId>org.springframework.ai</groupId>
+            <artifactId>spring-ai-markdown-document-reader</artifactId>
+            <version>1.0.0-M6</version>
+        </dependency>
+
         <!--Kryo序列化库-->
         <dependency>
             <groupId>com.esotericsoftware</groupId>
