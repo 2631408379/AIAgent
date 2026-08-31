@@ -1,13 +1,11 @@
 package com.dongyu.superaiiagent.app;
 
 import com.dongyu.superaiiagent.advisor.MyLoggerAdvisor;
-import com.dongyu.superaiiagent.advisor.ReReadingAdvisor;
-import com.dongyu.superaiiagent.chatmemory.FileBasedChatMemory;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
-import org.springframework.ai.chat.client.advisor.QuestionAnswerAdvisor;
+import org.springframework.ai.chat.client.advisor.api.Advisor;
 import org.springframework.ai.chat.memory.InMemoryChatMemory;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.model.ChatResponse;
@@ -89,13 +87,17 @@ public class LoveApp {
     @Resource
     private VectorStore loveAppVectorStore;
 
+    @Resource
+    private Advisor loveAppRagCloudAdvisor;
+
     public String doChatWithRag(String message,String chatId) {
         ChatResponse chatResponse = chatClient.prompt()
                 .user(message)
                 .advisors(spec -> spec.param(CHAT_MEMORY_CONVERSATION_ID_KEY, chatId)
                         .param(CHAT_MEMORY_RETRIEVE_SIZE_KEY, 10))
                 .advisors(new MyLoggerAdvisor())//开启日志
-                .advisors(new QuestionAnswerAdvisor(loveAppVectorStore))//应用知识库问答
+//                .advisors(new QuestionAnswerAdvisor(loveAppVectorStore))//本地知识库问答
+                .advisors(loveAppRagCloudAdvisor)//云知识库问答
                 .call()
                 .chatResponse();
         String content = chatResponse.getResult().getOutput().getText();
