@@ -1,10 +1,12 @@
 package com.dongyu.superaiiagent.app;
 
 import com.dongyu.superaiiagent.advisor.MyLoggerAdvisor;
+import com.dongyu.superaiiagent.rag.LoveAppRagCustomAdvisorFactory;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
+import org.springframework.ai.chat.client.advisor.QuestionAnswerAdvisor;
 import org.springframework.ai.chat.client.advisor.api.Advisor;
 import org.springframework.ai.chat.memory.InMemoryChatMemory;
 import org.springframework.ai.chat.model.ChatModel;
@@ -30,8 +32,12 @@ public class LoveApp {
     //定义恋爱报告类
     public record LoveReport(String title, List<String> suggestions){};
 
+    @Resource
+    private VectorStore loveAppVectorStore;
+
     //初始化chatClient对象,指定系统提示词以及记忆advisor。通过构造器注入的方式注入dashscopeChatModel.
     private LoveApp(ChatModel dashscopeChatModel) {
+
 
         //初始化基于文件的对话记忆
         //定义文件的存放目录
@@ -52,7 +58,6 @@ public class LoveApp {
                 .defaultAdvisors(
                         new MessageChatMemoryAdvisor(chatMemory),
                         new MyLoggerAdvisor()
-
                 )
                 .build();
 
@@ -84,8 +89,7 @@ public class LoveApp {
         return loveReport;
     }
 
-    @Resource
-    private VectorStore loveAppVectorStore;
+
 
     @Resource
     private Advisor loveAppRagCloudAdvisor;
@@ -96,8 +100,9 @@ public class LoveApp {
                 .advisors(spec -> spec.param(CHAT_MEMORY_CONVERSATION_ID_KEY, chatId)
                         .param(CHAT_MEMORY_RETRIEVE_SIZE_KEY, 10))
                 .advisors(new MyLoggerAdvisor())//开启日志
-//                .advisors(new QuestionAnswerAdvisor(loveAppVectorStore))//本地知识库问答
-                .advisors(loveAppRagCloudAdvisor)//云知识库问答
+                .advisors(new QuestionAnswerAdvisor(loveAppVectorStore))//本地知识库问答
+//                .advisors(loveAppRagCloudAdvisor)//云知识库问答
+                .advisors(LoveAppRagCustomAdvisorFactory.createLoveAppCustomAdvisor(loveAppVectorStore,"已婚"))
                 .call()
                 .chatResponse();
         String content = chatResponse.getResult().getOutput().getText();

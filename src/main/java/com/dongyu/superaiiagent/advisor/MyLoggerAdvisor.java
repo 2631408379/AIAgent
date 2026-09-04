@@ -17,7 +17,7 @@ public class MyLoggerAdvisor implements CallAroundAdvisor, StreamAroundAdvisor {
     @Override
     public int getOrder() {
         //值越小，优先级越高
-        return 10;
+        return 100;
     }
 
 

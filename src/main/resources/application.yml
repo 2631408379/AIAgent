@@ -7,6 +7,11 @@ spring:
     chat:
       options:
         model: qwen-plus
+    vectorstore:
+      pgvector:
+        index-type: HNSW
+        distance-type: cosine_distance
+        max-document-batch-size: 10000
   profiles:
     active: ${SPRING_PROFILES_ACTIVE:dev}
 
